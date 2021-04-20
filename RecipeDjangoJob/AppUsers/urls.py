@@ -14,6 +14,7 @@ urlpatterns = [
     path('User/login/',views.login , name="login" ),
     path('register',views.registerUser , name="register" ),
     path('User/register',views.registerUserCustom , name="registerCustom" ),
+     path('getCompany/',views.getCompany  ),
     path('active/<email>/<token>',views.active,name='active'),
      path('',include(router.urls) ),
 ]

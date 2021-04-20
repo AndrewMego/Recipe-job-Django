@@ -7,7 +7,7 @@ class Blog(models.Model):
     title=models.CharField(max_length=50 )
     location=models.CharField(max_length=50 )
     description=models.TextField(max_length=100 )
-    
+    published_at=models.DateTimeField(null=True)
 
 class blogImg(models.Model):
     blogID =  models.ForeignKey( Blog , on_delete=models.CASCADE )
