@@ -6,13 +6,8 @@ class jobSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = jobs
+
         fields = ['id' , 'userID' , 'title' , 'location', 'jobType' , 'description' ,'published_at' , 'vacancy' , 'salary' , 'categoryID' ,'experience','aplayingNum','qualification','benefits','gender']
-
-
-
-
-
-
 
 
 
@@ -35,9 +30,6 @@ class aplayJobSerializer(serializers.Serializer):
     
     class Meta:
         model = aplayUser
+
         fields = ['userID','jobID','name' , 'phone_number', 'uploadCV']        
 
-        
-
-
-      
