@@ -1,5 +1,5 @@
 from rest_framework import  serializers
-from .models import users , company
+from .models import users 
 from django.contrib.auth.models  import User
 
 
@@ -20,10 +20,10 @@ class userSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id','username','email','first_name','last_name','password']
 
-class companySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = company
-        fields = '__all__'     
+# class companySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = company
+#         fields = '__all__'     
 
 
 class loginSerializer(serializers.ModelSerializer):
@@ -32,7 +32,8 @@ class loginSerializer(serializers.ModelSerializer):
         fields = ['username','password']    
 
 
-
+class FileSerializer(serializers.ModelSerializer):
+    fileUpload = serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True)
 # class userSerializer(serializers.ModelSerializer):
 
 #     class customuserSerializer(serializers.ModelSerializer):
