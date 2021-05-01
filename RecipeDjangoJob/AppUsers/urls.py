@@ -13,7 +13,8 @@ urlpatterns = [
    
     path('User/login/',views.login , name="login" ),
     path('register',views.registerUser , name="register" ),
-    path('User/register',views.registerUserCustom , name="registerCustom" ),
+    path('updateUser',views.updateUser , name="register" ),
+   path('updateSkill/',views.updateSkill  ),
      path('getCompany/',views.getCompany  ),
     path('active/<email>/<token>',views.active,name='active'),
      path('',include(router.urls) ),

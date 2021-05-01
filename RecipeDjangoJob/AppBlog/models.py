@@ -1,7 +1,11 @@
 from django.db import models
 from AppJob import models as modelJob
 from AppUsers import models as modelUser
-# Create your models here.
+
+
+def upload_path(instance, filname):
+    return '/'.join(['blog', filname])
+
 class Blog(models.Model):
     userID=models.ForeignKey(modelUser.users,on_delete=models.CASCADE)
     title=models.CharField(max_length=50 )
@@ -11,7 +15,7 @@ class Blog(models.Model):
 
 class blogImg(models.Model):
     blogID =  models.ForeignKey( Blog , on_delete=models.CASCADE )
-    blogimg = models.ImageField(upload_to = "images/blog/")
+    blogimg = models.ImageField(upload_to = upload_path)
 
 
 

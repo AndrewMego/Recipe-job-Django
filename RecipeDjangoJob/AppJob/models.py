@@ -11,19 +11,19 @@ class jobs(models.Model):
 
     userID = models.ForeignKey(modelUser.users, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
-    location = models.ForeignKey('locations', on_delete=models.CASCADE)
+    location = models.ForeignKey('locations', on_delete=models.CASCADE , null=True, blank=True)
     jobType = models.CharField(max_length=1, choices=JOB_TYPE)
     description = models.TextField(max_length=100)
     published_at = models.DateTimeField()
     vacancy = models.IntegerField(validators=[MinValueValidator(1)], default=1)
     salary = models.FloatField(null=True, blank=True)
-    categoryID = models.ForeignKey('category', on_delete=models.CASCADE)
+    categoryID = models.ForeignKey('category', on_delete=models.CASCADE , null=True, blank=True)
     experience = models.CharField(max_length=50)
     aplayingNum = models.IntegerField()
     qualification = models.CharField(null=True, blank=True,max_length=50)
     benefits = models.CharField(null=True, blank=True,max_length=50)
     gender = models.CharField(null=True, blank=True,max_length=50)
-
+    ExEmail = models.CharField(null=True, blank=True,max_length=50)
 
 class category(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -49,7 +49,9 @@ class locations(models.Model):
 class aplayUser(models.Model):
     userID = models.ForeignKey(modelUser.users, on_delete=models.CASCADE)
     jobID = models.ForeignKey(jobs, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=70)
+    email = models.CharField(max_length=30 , null=True, blank=True)
+    coverLitter =  models.CharField(max_length=100 , null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     uploadCV = models.FileField(upload_to="files/cv/")
     aplay_at = models.DateTimeField()
@@ -59,13 +61,9 @@ class aplayUser(models.Model):
         unique_together = (('userID', 'jobID'))
 
 
-class certificate(models.Model):
-    uploadCer = models.FileField(upload_to="files/certificate/")
-
 
 class aplayCer(models.Model):
-    cerID = models.ForeignKey(certificate, on_delete=models.CASCADE)
+    uploadCer = models.FileField(upload_to="files/certificate/" ,  null=True, blank=True)
     aplayID = models.ForeignKey(aplayUser, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = (('cerID', 'aplayID'))
+    
