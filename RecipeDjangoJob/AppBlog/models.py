@@ -12,12 +12,18 @@ class Blog(models.Model):
     location=models.CharField(max_length=50 )
     description=models.TextField(max_length=100 )
     published_at=models.DateTimeField(null=True)
+    numLike = models.IntegerField(default=0 )
 
 class blogImg(models.Model):
     blogID =  models.ForeignKey( Blog , on_delete=models.CASCADE )
     blogimg = models.ImageField(upload_to = upload_path)
 
 
+class likesBlog(models.Model):
+    blogID = models.ForeignKey( Blog , on_delete=models.CASCADE)
+    userID = models.ForeignKey( modelUser.users , on_delete=models.CASCADE)
+    class Meta:
+        unique_together = (('userID', 'blogID'))  
 
 class comments(models.Model):
     blogID=models.ForeignKey('Blog',on_delete=models.CASCADE) 

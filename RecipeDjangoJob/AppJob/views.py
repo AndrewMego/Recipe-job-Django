@@ -77,8 +77,7 @@ def jobDetails(request):
 
     if request.data.get('name'):
         Tags = request.data.get('name')
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print(Tags)
+     
         for tag in Tags:
             tagsJob.objects.create(tagID=tags.objects.get(
                 id=tag), jobID=jobs.objects.get(id=get_jobID))
@@ -198,18 +197,26 @@ def searchJob(request):
         jobsList = list(dict.fromkeys(jobsList))
         for item in jobsList:
 
-            print(item)
-            print(item)
+          
             getallJob = jobs.objects.get(id=int(item))
 
-            print(getallJob.userID.id)
+          
             getUsers = users.objects.filter(id=getallJob.userID.id).first()
             getUserDjango = User.objects.filter(
                 id=getUsers.customUserID.id).first()
-            getCat = category.objects.filter(
-                id=getallJob.categoryID.id).first()
-            getLoc = locations.objects.filter(id=getallJob.location.id).first()
-            #
+
+            if(getallJob.location != None):
+                getLoc = locations.objects.filter(id=getallJob.location.id).first()
+            else:
+                getLoc = "The location is not available"    
+
+
+            if(getallJob.categoryID):
+                getCat = category.objects.filter(id=getallJob.categoryID.id).first()
+            else:
+                getCat = 'The Category is not available'
+
+            
             url = 'http://127.0.0.1:8000/media/{}'.format(
                 getUsers.profilePic)
             userJob = ({
@@ -221,21 +228,38 @@ def searchJob(request):
                 'phone_number': getUsers.phone_number,
             })
 
-            jobInfo.append({
-                'jobID': getallJob.id,
-                'title': getallJob.title,
-                'location': getLoc.locName,
-                'locID': getLoc.id,
-                'jobType': getallJob.jobType,
-                'description': getallJob.description,
-                'published_at': getallJob.published_at,
-                'vacancy': getallJob.vacancy,
-                'salary': getallJob.salary,
-                'experience': getallJob.experience,
-                'catID': getCat.id,
-                'catName': getCat.name,
-                'userID': userJob
-            })
+            if(getallJob.location != None):
+                jobInfo.append({
+                    'jobID': getallJob.id,
+                    'title': getallJob.title,
+                    'location': getLoc.locName,
+                    'locID': getLoc.id,
+                    'jobType': getallJob.jobType,
+                    'description': getallJob.description,
+                    'published_at': getallJob.published_at,
+                    'vacancy': getallJob.vacancy,
+                    'salary': getallJob.salary,
+                    'experience': getallJob.experience,
+                    'catID': getCat.id,
+                    'catName': getCat.name,
+                    'userID': userJob
+                })
+            else: 
+                jobInfo.append({
+                    'jobID': getallJob.id,
+                    'title': getallJob.title,
+                    'location': getLoc,
+                  
+                    'jobType': getallJob.jobType,
+                    'description': getallJob.description,
+                    'published_at': getallJob.published_at,
+                    'vacancy': getallJob.vacancy,
+                    'salary': getallJob.salary,
+                    'experience': getallJob.experience,
+                   
+                    'catName': getCat,
+                    'userID': userJob
+                })   
 
     return Response({"info": jobInfo},  status=status.HTTP_201_CREATED)
 
@@ -439,11 +463,9 @@ def jobInfo(request):
 
     gettagId = tagsJob.objects.filter(jobID=alljob).all()
     for itemtag in gettagId:
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print(itemtag.tagID.id)
+       
         getTag = tags.objects.filter(id=itemtag.tagID.id).first()
-        print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-        print(getTag.tag)
+       
         tag.append(getTag.tag)
     #
     url = 'http://127.0.0.1:8000/media/{}'.format(
@@ -502,9 +524,15 @@ def jobInfo(request):
 @api_view(['POST'])
 def deleteJob(request):
     try:
-        tagsJob.objects.filter(
-            jobID=jobs.objects.filter(id=request.data)).all()
-        jobs.objects.filter(id=request.data).all()
+        # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$44")
+        # print(request.data) 
+        # tagDelete = tagsJob.objects.filter(
+        #     jobID=jobs.objects.get(id=request.data)).all()
+        # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$44")
+        # print(tagDelete)   
+        # for item in tagDelete:
+        #     item.delete()    
+        jobs.objects.filter(id=request.data).delete()
         return Response({"msg": "success"})
     except IntegrityError as ex:
         transaction.rollback()
@@ -554,8 +582,7 @@ def aplayJob(request):
 @api_view(['POST'])
 def getjob_with_related_ApplayingUser(request):
     jobInfo = []
-    print("#############################################################")
-    print(request.data)
+   
     aplayingJob = aplayUser.objects.filter(userID=request.data).all()
     if(aplayingJob.count() > 0):
         for item in aplayingJob:
@@ -601,8 +628,6 @@ def getj_ApplayingUser_with_relatedCompany(request):
     applayingInfo = []
     try:
         allJob = jobs.objects.filter(id=request.data).first()
-        print("#####################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$##############")
-
         getapplayingJob = aplayUser.objects.filter(jobID=allJob.id).all()
         if(getapplayingJob.count() > 0):
 
@@ -634,7 +659,7 @@ def getj_ApplayingUser_with_relatedCompany(request):
                                       'CV': urlCV,
                                       'certify': getCerArr})
 
-        print(applayingInfo)
+       
         return Response(applayingInfo)
 
     except IntegrityError as ex:

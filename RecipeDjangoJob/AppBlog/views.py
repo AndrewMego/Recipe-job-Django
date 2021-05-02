@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from AppBlog.models import Blog, comments, blogImg
+from AppBlog.models import Blog, blogImg, comments, likesBlog
 from .serializers import blogSerializer, commentSerializer, FileListSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -73,6 +73,7 @@ def getBlog(request):
               'description': item.description,
               'published_at': item.published_at,
               'blogID':item.id,
+              'numLike':item.numLike,
               'comments':allcomments
             })  
 
@@ -167,7 +168,8 @@ def getBlog_with_related_company(request):
               'location': item.location,
               'description': item.description,
               'published_at': item.published_at,
-              'comments':allcomments
+              'comments':allcomments,
+               'numLike':item.numLike
             })  
 
         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
@@ -221,22 +223,14 @@ def getOneBlog(request):
               'location': oneBlog.location,
               'description': oneBlog.description,
               'published_at': oneBlog.published_at,
-              'comments':allcomments
+              'comments':allcomments,
+               'numLike':oneBlog.numLike,
             })  
 
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
     print(blogs)    
     return Response(blogs)    
     
-
-
-
-
-
-
-
-
-
 
 
 @api_view(['POST']) 
@@ -307,3 +301,29 @@ def addComment(request):
 # class addComment(viewsets.ModelViewSet):
 #     serializer_class = commentSerializer
 #     queryset = comments.objects.all()
+@api_view(['POST']) 
+def Like(request):
+    getBlog = Blog.objects.filter(id = request.data.get('blogID')).first()
+    if(request.data.get('liked') == '0'):
+        getBlog.numLike = getBlog.numLike - 1 
+        getBlog.save()
+        likesBlog.objects.filter(blogID = getBlog ,userID = users.objects.get(id = request.data.get('userID'))).delete()
+
+    if(request.data.get('liked') == '1'):
+        getBlog.numLike = getBlog.numLike + 1
+        getBlog.save()    
+        likesBlog.objects.create(blogID = getBlog ,userID = users.objects.get(id = request.data.get('userID')))
+
+    return Response("done") 
+
+@api_view(['POST']) 
+def getlikesBlog_belongUser(request):
+    getblogs =  likesBlog.objects.filter(userID = users.objects.get(id = request.data).id).all()
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    print(getblogs)
+    blogs=[]
+    if(getblogs.count() > 0):
+        for item in getblogs:
+            blogs.append(item.blogID.id)
+
+    return Response(blogs)    
