@@ -27,7 +27,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 def getBlog(request):
     blogs =[]
-    getallBlog= Blog.objects.all()
+    getallBlog= Blog.objects.all().order_by('-id')
     if(getallBlog.count() > 0):
         for item in getallBlog:
 
@@ -268,7 +268,7 @@ def ubdateBlog(request):
 
 
         if(request.data.get('description') != ''):
-            updateBlog = Blog.objects.filter(id =request.data.get('blogID') ).first() 
+            updateBlog = Blog.objects.filter(id =int(request.data.get('blogID'))).first() 
             updateBlog.description = request.data.get('description')
             updateBlog.save()
 

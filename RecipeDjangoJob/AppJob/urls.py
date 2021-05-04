@@ -10,6 +10,7 @@ from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
 
+ path('addCat/', views.addCat),
     path('addJob', views.addJob, name="jobDetails"),
     path('addJob/jobDetails/', views.jobDetails, name="jobDetails"),
     path('addJob/getLoc/', views.getLoc, name="getLoc"),

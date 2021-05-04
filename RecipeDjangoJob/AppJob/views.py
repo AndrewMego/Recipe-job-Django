@@ -21,10 +21,11 @@ import logging
 
 @api_view(['POST'])
 def addJob(request):
-
+    print("##############################################33")
+    print(request.data)
     title = request.data.get('title')
     if(request.data.get('location')):
-        location = request.data.get('location')
+        location = locations.objects.get(id= request.data.get('location') )
     else:
         location = None
     if(request.data.get('jobType') == ' Full Time'):
@@ -142,7 +143,9 @@ def getInfoCat(request):
 
 @api_view(['POST'])
 def addCat(request):
-    getCat = category.objects.create(name=request.POST.get('name'))
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    print(request.data)
+    getCat = category.objects.create(name=request.data.get('name'))
     return Response({"id": getCat.id})
 
 
@@ -161,13 +164,13 @@ def searchJob(request):
 
     if(request.data.get('Ex')):
         Ex = request.data.get('Ex')
-        ExJob = jobs.objects.filter(experience=Ex).all()
+        ExJob = jobs.objects.filter(experience=Ex).all().order_by('-id')
         for job in ExJob:
             jobsList.append(job.id)
 
     if(request.data.get('title')):
         title = request.data.get('title')
-        getjob = jobs.objects.filter(title=title).all()
+        getjob = jobs.objects.filter(title=title).all().order_by('-id')
         for item in getjob:
             jobsList.append(item.id)
 
@@ -176,20 +179,20 @@ def searchJob(request):
 
         getLocID = locations.objects.filter(id=int(loc)).first()
 
-        getjob = jobs.objects.filter(location=getLocID).all()
+        getjob = jobs.objects.filter(location=getLocID).all().order_by('-id')
         for item in getjob:
             jobsList.append(item.id)
 
     if(request.data.get('userID')):
         getuserID = request.data.get('userID')
         getjob = jobs.objects.filter(
-            userID=users.objects.get(id=getuserID)).all()
+            userID=users.objects.get(id=getuserID)).all().order_by('-id')
         for item in getjob:
             jobsList.append(item.id)
 
     if(request.data.get('gender')):
         getuserGender = request.data.get('gender')
-        getjob = jobs.objects.filter(gender=getuserGender).all()
+        getjob = jobs.objects.filter(gender=getuserGender).all().order_by('-id')
         for item in getjob:
             jobsList.append(item.id)
 
@@ -267,7 +270,7 @@ def searchJob(request):
 @api_view(['GET'])
 def allJobs(request):
     jobInfo = []
-    alljob = jobs.objects.all()
+    alljob = jobs.objects.all().order_by('-id')
     if(alljob.count() > 0):
         for item in alljob:
 
@@ -333,7 +336,7 @@ def allJobs(request):
 def getjob_with_related_Job(request):
     jobInfo = []
     alljob = jobs.objects.filter(
-        categoryID=category.objects.get(id=request.data)).all()
+        categoryID=category.objects.get(id=request.data)).all().order_by('-id')
     if(alljob.count() > 0):
         for item in alljob:
 
@@ -376,7 +379,7 @@ def getjob_with_related_Job(request):
 def getjob_with_related_company(request):
     jobInfo = []
     alljob = jobs.objects.filter(
-        userID=users.objects.get(id=request.data)).all()
+        userID=users.objects.get(id=request.data)).all().order_by('-id')
     if(alljob.count() > 0):
         for item in alljob:
 
@@ -711,30 +714,44 @@ def acceptUser_ForJob(request):
 
 @api_view(['POST'])
 def updateJob(request):
-    getJob = jobs.objects.filter(id = request.data.get('jobID')).first()
-    if(request.data.get('title')):
-        getJob.title = request.data.get('title')
-        getJob.save()
+    try:
+        print("$$$$$$$$$$$$$$$$$")
+        print(request.data)
+        getJob = jobs.objects.filter(id = request.data.get('jobID')).first()
+        if(request.data.get('title')):
+            print("1")
+            getJob.title = request.data.get('title')
+            
 
-    if(request.data.get('salary')):
-        getJob.salary = request.data.get('salary')
-        getJob.save()
+        if(request.data.get('salary')):
+            print("1")
+            getJob.salary = request.data.get('salary')
+            
 
-    if(request.data.get('benefit')):
-        getJob.benefits = request.data.get('benefit')
-        getJob.save()
+        if(request.data.get('benefit')):
+            print("1")
+            getJob.benefits = request.data.get('benefit')
+            
 
-    if(request.data.get('vacancy')):
-        getJob.vacancy = request.data.get('vacancy')
-        getJob.save()    
+        if(request.data.get('vacancy')):
+            print("1")
+            getJob.vacancy = request.data.get('vacancy')
+                
 
-    if(request.data.get('description')):
-        getJob.description = request.data.get('description')
-        getJob.save()     
+        if(request.data.get('description')):
+            print("1")
+            getJob.description = request.data.get('description')
+                 
 
 
-    if(request.data.get('qualifi')):
-        getJob.qualification = request.data.get('qualifi')
+        if(request.data.get('qualifi')):
+            print("1")
+            getJob.qualification = request.data.get('qualifi')
+        
         getJob.save() 
 
-    return Response({"msg": "success"})
+        return Response({"msg": "success"})
+    except IntegrityError as ex:
+        transaction.rollback()
+        message = ex.args
+        return Response({"msg": "exist"})
